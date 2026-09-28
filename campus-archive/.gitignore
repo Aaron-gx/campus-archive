@@ -1,0 +1,75 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files（含 AUTH_SECRET/MASTER_KEY/AI_API_KEY，绝不入库）
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+/src/generated/prisma
+
+# 用户上传的档案文件（含加密数据，绝不入库）
+/storage
+*.db
+*.db-journal
+
+# 数据库与档案备份包
+/backups
+
+# OCR wasm 运行时：由 npm postinstall 从 node_modules/onnxruntime-web 复制生成
+/public/ort
+
+# 端到端测试：脚本入库，运行产物不入库
+/.e2e/cookies.txt
+/.e2e/dec.bin
+/.e2e/export.zip
+/test-idcard.jpg
+/test-cert.jpg
+/test-idcard-ocr.jpg
+/test-license.jpg
+
+# 本地隔离区（测试证件照、临时切图、审查报告等只留本机）
+/.local
+
+# AI / 编辑器工具的工作区状态
+/.workbuddy
+/.mimosa
+/.agents
+/.claude
+/.windsurf
+/skills-lock.json
+
+# 编辑器
+.idea/
+*.iml

@@ -1,0 +1,81 @@
+# ============================================================
+# 简册 · 个人电子档案袋 — 仓库级忽略规则
+# 子目录原有的 .gitignore 依旧生效，这里是跨两端的统一兜底。
+# ============================================================
+
+# ---- 本地隔离区 ----
+# 安全审计报告、测试证件照、临时切图、原始素材等只留在本机，绝不入库
+.local/
+**/.local/
+
+# ---- 环境变量与密钥 ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+key.properties
+**/*.keystore
+**/*.jks
+
+# ---- 用户数据：数据库 / 加密档案 / 备份包 ----
+storage/
+backups/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+backup_*.zip
+
+# ---- 依赖与构建产物 ----
+node_modules/
+**/node_modules/
+.next/
+out/
+dist/
+build/
+**/build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---- Flutter / Dart / Gradle ----
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+**/.gradle/
+android/local.properties
+*.iml
+
+# ---- OCR wasm 运行时：由 npm postinstall 从 node_modules 复制生成 ----
+public/ort/
+**/public/ort/
+
+# ---- E2E 测试产物（测试脚本本身入库，运行产物不入库）----
+.e2e/cookies.txt
+.e2e/dec.bin
+.e2e/export.zip
+
+# ---- AI / 编辑器工具的工作区状态 ----
+.workbuddy/
+.mimosa/
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
+finding-ledger/
+hook-state/
+hook-status/
+
+# ---- 系统与编辑器 ----
+.DS_Store
+Thumbs.db
+.idea/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.swp
+*.class
+*.pyc

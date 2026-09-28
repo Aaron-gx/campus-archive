@@ -1,0 +1,33 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+val newBuildDir: Directory =
+    rootProject.layout.buildDirectory
+        .dir("../../build")
+        .get()
+rootProject.layout.buildDirectory.value(newBuildDir)
+
+subprojects {
+    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
+    project.layout.buildDirectory.value(newSubprojectBuildDir)
+}
+subprojects {
+    // 部分插件（file_picker 等）自带 compileSdk 34，与依赖库要求 ≥36 冲突，统一提升
+    // 注意：afterEvaluate 必须先于 evaluationDependsOn 注册，否则项目已评估完会报错
+    afterEvaluate {
+        extensions.findByType<com.android.build.gradle.LibraryExtension>()?.let { lib ->
+            if ((lib.compileSdk ?: 0) < 36) {
+                lib.compileSdk = 36
+            }
+        }
+    }
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register<Delete>("clean") {
+    delete(rootProject.layout.buildDirectory)
+}

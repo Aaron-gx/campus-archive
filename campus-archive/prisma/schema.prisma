@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  phone     String?  @unique
+  email     String?  @unique
+  school    String?
+  nickname  String
+  password  String
+  role      String   @default("user") // user | admin
+  avatar    String?
+  e2eeSalt       String?
+  e2eeWrappedKey String?
+  createdAt DateTime @default(now())
+  documents     Document[]
+  certificates  Certificate[]
+  exportRecords ExportRecord[]
+  trustedDevices TrustedDevice[]
+  auditLogs     AuditLog[]
+  sessions      Session[]
+  aiSetting     UserAiSetting?
+}
+
+// 服务端持久化会话：支持登出吊销、改密全部失效与多端协同
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+// 信任设备：二次验证勾选"信任此设备"后 30 天内免输密码
+model TrustedDevice {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique // cookie 中只存原始 token，库里存 sha256
+  label     String?  // 设备描述（UA 截断）
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 敏感操作审计：谁在什么时候查看/下载/导出/删除过什么
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String   // view | download | export | verify | delete | edit | login
+  docId     String?
+  docTitle  String?
+  detail    String?
+  ip        String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// 五大分类 + 子类（parent_id 自关联）
+model Category {
+  id        String     @id @default(cuid())
+  key       String     @unique
+  name      String
+  icon      String
+  order     Int        @default(0)
+  sensitive Boolean    @default(false)
+  parentId  String?
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryTree")
+  documents Document[]
+}
+
+model Document {
+  id          String       @id @default(cuid())
+  userId      String
+  categoryId  String
+  title       String
+  fileName    String
+  storedName  String
+  mimeType    String
+  size        Int
+  isSensitive Boolean      @default(false)
+  e2ee        Boolean      @default(false)
+  note        String?
+  meta        String?      // 结构化识别字段 JSON：{ side?: string, fields: [{label,value,badge?}] }
+  groupId     String?      // 证件组：正反面/主副页属于同一证件（同组多文件，列表合并为一张卡片）
+  side        String?      // 面标签：正面/反面/主页/副页…
+  sideOrder   Int?         // 组内排序（正面 0，反面 1）
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category      @relation(fields: [categoryId], references: [id])
+  certificate Certificate?
+
+  @@index([userId, groupId])
+}
+
+// 证书结构化字段（可独立存在，也可关联原件）
+model Certificate {
+  id         String    @id @default(cuid())
+  userId     String
+  documentId String?   @unique
+  name       String
+  org        String
+  level      String
+  awardedAt  DateTime
+  note       String?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+
+  @@index([userId, awardedAt])
+}
+
+model ExportRecord {
+  id              String   @id @default(cuid())
+  userId          String
+  categoryKeys    String
+  fileName        String
+  size            Int
+  verifyCode      String?  @unique
+  sha256          String?
+  manifestSummary String?
+  watermarkText   String?
+  signature       String?
+  checkCount      Int      @default(0)
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([verifyCode])
+  @@index([sha256])
+}
+
+model UserAiSetting {
+  userId    String   @id
+  apiKey    String
+  baseUrl   String
+  model     String
+  updatedAt String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

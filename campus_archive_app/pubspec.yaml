@@ -1,0 +1,41 @@
+name: campus_archive_app
+description: 简册 · 个人电子档案袋
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  provider: ^6.1.0
+  sqflite: ^2.3.0
+  path: ^1.9.0
+  path_provider: ^2.1.0
+  uuid: ^4.0.0
+  cryptography: ^2.7.0
+  flutter_secure_storage: ^9.0.0
+  flutter_image_compress: ^2.2.0
+  image_picker: ^1.1.0
+  file_picker: ^8.0.0
+  archive: ^3.6.0
+  pdf: ^3.11.0
+  share_plus: ^10.0.0
+  open_filex: ^4.5.0
+  cupertino_icons: ^1.0.8
+  http: ^1.2.0
+  http_parser: ^4.0.2
+  shared_preferences: ^2.3.0
+  connectivity_plus: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
